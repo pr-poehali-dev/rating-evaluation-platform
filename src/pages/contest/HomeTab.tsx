@@ -24,9 +24,9 @@ export default function HomeTab({
           Судейская панель
         </p>
         <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-4">
-          Оценивайте чисто
+          Оцениваем ваших любимцев!
           <br />
-          и без суеты.
+          Честно и без обмана.
         </h1>
         <p className="text-muted-foreground text-lg max-w-md">
           Пять критериев, десятибалльная шкала, автоматический средний балл.
