@@ -69,7 +69,7 @@ export default function Index() {
     localStorage.setItem(`${STORAGE_KEY}:judgeParticipant`, JSON.stringify(judgeParticipant));
   }, [judgeParticipant]);
 
-  const contest = contests.find((c) => c.id === activeId)!;
+  const contest = contests.find((c) => c.id === activeId) ?? contests[0];
 
   const setScore = (pid: string, kid: string, value: number) => {
     setScores((prev) => ({
@@ -79,6 +79,7 @@ export default function Index() {
   };
 
   const avgFor = (pid: string) => {
+    if (!contest) return 0;
     const vals = contest.criteria.map((k) => scores[pid]?.[k.id] ?? 0);
     const filled = vals.filter((v) => v > 0);
     if (!filled.length) return 0;
@@ -87,9 +88,11 @@ export default function Index() {
 
   const ranking = useMemo(
     () =>
-      [...contest.participants]
-        .map((p) => ({ ...p, avg: avgFor(p.id) }))
-        .sort((a, b) => b.avg - a.avg),
+      contest
+        ? [...contest.participants]
+            .map((p) => ({ ...p, avg: avgFor(p.id) }))
+            .sort((a, b) => b.avg - a.avg)
+        : [],
     [contest, scores]
   );
 
@@ -175,6 +178,8 @@ export default function Index() {
     setContests((cs) => [...cs, nc]);
     setActiveId(nc.id);
   };
+
+  if (!contest && tab !== 'home') setTab('home');
 
   return (
     <div className="min-h-screen bg-background text-foreground">
