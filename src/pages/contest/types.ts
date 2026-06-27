@@ -9,7 +9,7 @@ export type Contest = {
   criteria: Criterion[];
 };
 
-export type Tab = 'home' | 'judge' | 'results';
+export type Tab = 'home' | 'setup' | 'judge' | 'results';
 
 export const uid = () => Math.random().toString(36).slice(2, 9);
 

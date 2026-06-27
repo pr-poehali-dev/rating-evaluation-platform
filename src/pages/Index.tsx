@@ -3,6 +3,7 @@ import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Contest, Scores, Tab, uid, load, initialContests, STORAGE_KEY } from './contest/types';
 import HomeTab from './contest/HomeTab';
+import SetupTab from './contest/SetupTab';
 import JudgeTab from './contest/JudgeTab';
 import ResultsTab from './contest/ResultsTab';
 
@@ -56,6 +57,9 @@ export default function Index() {
   const updateContest = (patch: Partial<Contest>) =>
     setContests((cs) => cs.map((c) => (c.id === activeId ? { ...c, ...patch } : c)));
 
+  const updateTitle = (title: string) => updateContest({ title });
+  const updateDate = (date: string) => updateContest({ date });
+
   const addParticipant = () =>
     updateContest({
       participants: [...contest.participants, { id: uid(), name: 'Новый участник' }],
@@ -96,6 +100,7 @@ export default function Index() {
     };
     setContests((cs) => [...cs, nc]);
     setActiveId(nc.id);
+    setTab('setup');
   };
 
   if (!contest) {
@@ -122,6 +127,7 @@ export default function Index() {
           <nav className="flex items-center gap-1">
             {([
               ['home', 'Конкурсы'],
+              ['setup', 'Настройка'],
               ['judge', 'Оценивание'],
               ['results', 'Результаты'],
             ] as [Tab, string][]).map(([t, label]) => (
@@ -151,6 +157,22 @@ export default function Index() {
           />
         )}
 
+        {tab === 'setup' && (
+          <SetupTab
+            contest={contest}
+            setTab={setTab}
+            updateTitle={updateTitle}
+            updateDate={updateDate}
+            addParticipant={addParticipant}
+            removeParticipant={removeParticipant}
+            renameParticipant={renameParticipant}
+            setParticipantPhoto={setParticipantPhoto}
+            addCriterion={addCriterion}
+            removeCriterion={removeCriterion}
+            renameCriterion={renameCriterion}
+          />
+        )}
+
         {tab === 'judge' && (
           <JudgeTab
             contest={contest}
@@ -160,13 +182,6 @@ export default function Index() {
             setTab={setTab}
             setScore={setScore}
             avgFor={avgFor}
-            addParticipant={addParticipant}
-            removeParticipant={removeParticipant}
-            renameParticipant={renameParticipant}
-            setParticipantPhoto={setParticipantPhoto}
-            addCriterion={addCriterion}
-            removeCriterion={removeCriterion}
-            renameCriterion={renameCriterion}
           />
         )}
 

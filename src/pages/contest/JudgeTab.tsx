@@ -1,6 +1,5 @@
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
-import ManagePanel from './ManagePanel';
 import { Contest, Scores, Tab } from './types';
 
 export default function JudgeTab({
@@ -11,13 +10,6 @@ export default function JudgeTab({
   setTab,
   setScore,
   avgFor,
-  addParticipant,
-  removeParticipant,
-  renameParticipant,
-  setParticipantPhoto,
-  addCriterion,
-  removeCriterion,
-  renameCriterion,
 }: {
   contest: Contest;
   scores: Scores;
@@ -26,13 +18,6 @@ export default function JudgeTab({
   setTab: (tab: Tab) => void;
   setScore: (pid: string, kid: string, value: number) => void;
   avgFor: (pid: string) => number;
-  addParticipant: () => void;
-  removeParticipant: (id: string) => void;
-  renameParticipant: (id: string, name: string) => void;
-  setParticipantPhoto: (id: string, photo: string | undefined) => void;
-  addCriterion: () => void;
-  removeCriterion: (id: string) => void;
-  renameCriterion: (id: string, name: string) => void;
 }) {
   return (
     <div className="animate-fade-up">
@@ -41,9 +26,14 @@ export default function JudgeTab({
           <p className="text-sm text-accent font-medium mb-1">{contest.title}</p>
           <h1 className="font-display text-4xl">Оценивание участника</h1>
         </div>
-        <Button onClick={() => setTab('results')} variant="outline" className="gap-2">
-          <Icon name="Trophy" size={16} /> К результатам
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setTab('setup')} variant="outline" className="gap-2">
+            <Icon name="Settings" size={16} /> Настройка
+          </Button>
+          <Button onClick={() => setTab('results')} variant="outline" className="gap-2">
+            <Icon name="Trophy" size={16} /> К результатам
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2 flex-wrap mb-8">
@@ -61,7 +51,10 @@ export default function JudgeTab({
           </button>
         ))}
         {!contest.participants.length && (
-          <p className="text-muted-foreground text-sm">Добавьте участников в разделе «Управление» ниже.</p>
+          <p className="text-muted-foreground text-sm">
+            Добавьте участников в{' '}
+            <button className="underline text-accent" onClick={() => setTab('setup')}>Настройке конкурса</button>.
+          </p>
         )}
       </div>
 
@@ -121,28 +114,6 @@ export default function JudgeTab({
           </div>
         </div>
       )}
-
-      <div className="mt-12 grid gap-8 md:grid-cols-2">
-        <ManagePanel
-          title="Участники"
-          icon="Users"
-          items={contest.participants}
-          onRename={renameParticipant}
-          onRemove={removeParticipant}
-          onAdd={addParticipant}
-          addLabel="Добавить участника"
-          onPhoto={setParticipantPhoto}
-        />
-        <ManagePanel
-          title="Критерии"
-          icon="ListChecks"
-          items={contest.criteria}
-          onRename={renameCriterion}
-          onRemove={removeCriterion}
-          onAdd={addCriterion}
-          addLabel="Добавить критерий"
-        />
-      </div>
     </div>
   );
 }
