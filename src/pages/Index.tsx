@@ -179,7 +179,16 @@ export default function Index() {
     setActiveId(nc.id);
   };
 
-  if (!contest && tab !== 'home') setTab('home');
+  if (!contest) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <p className="text-muted-foreground">Нет конкурсов</p>
+        <Button onClick={addContest} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+          <Icon name="Plus" size={16} /> Создать конкурс
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
