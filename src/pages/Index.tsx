@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,12 +38,36 @@ const initialContests: Contest[] = [
 
 type Tab = 'home' | 'judge' | 'results';
 
+const STORAGE_KEY = 'contest-judge-v1';
+
+const load = <T,>(key: string, fallback: T): T => {
+  try {
+    const raw = localStorage.getItem(`${STORAGE_KEY}:${key}`);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export default function Index() {
-  const [contests, setContests] = useState<Contest[]>(initialContests);
-  const [activeId, setActiveId] = useState<string>(initialContests[0].id);
+  const [contests, setContests] = useState<Contest[]>(() => load('contests', initialContests));
+  const [activeId, setActiveId] = useState<string>(() => load('activeId', initialContests[0].id));
   const [tab, setTab] = useState<Tab>('home');
-  const [scores, setScores] = useState<Scores>({});
-  const [judgeParticipant, setJudgeParticipant] = useState<string>('p1');
+  const [scores, setScores] = useState<Scores>(() => load('scores', {}));
+  const [judgeParticipant, setJudgeParticipant] = useState<string>(() => load('judgeParticipant', 'p1'));
+
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}:contests`, JSON.stringify(contests));
+  }, [contests]);
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}:scores`, JSON.stringify(scores));
+  }, [scores]);
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}:activeId`, JSON.stringify(activeId));
+  }, [activeId]);
+  useEffect(() => {
+    localStorage.setItem(`${STORAGE_KEY}:judgeParticipant`, JSON.stringify(judgeParticipant));
+  }, [judgeParticipant]);
 
   const contest = contests.find((c) => c.id === activeId)!;
 
