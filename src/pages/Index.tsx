@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 
 type Criterion = { id: string; name: string };
 type Scores = Record<string, Record<string, number>>;
-type Participant = { id: string; name: string };
+type Participant = { id: string; name: string; photo?: string };
 type Contest = {
   id: string;
   title: string;
@@ -108,6 +108,10 @@ export default function Index() {
   const renameParticipant = (id: string, name: string) =>
     updateContest({
       participants: contest.participants.map((p) => (p.id === id ? { ...p, name } : p)),
+    });
+  const setParticipantPhoto = (id: string, photo: string | undefined) =>
+    updateContest({
+      participants: contest.participants.map((p) => (p.id === id ? { ...p, photo } : p)),
     });
 
   const addCriterion = () =>
@@ -325,9 +329,21 @@ export default function Index() {
             {judgeParticipant && contest.participants.some((p) => p.id === judgeParticipant) && (
               <div className="rounded-2xl bg-card border border-border p-8">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="font-display text-3xl">
-                    {contest.participants.find((p) => p.id === judgeParticipant)?.name}
-                  </h2>
+                  <div className="flex items-center gap-4">
+                    {(() => {
+                      const p = contest.participants.find((p) => p.id === judgeParticipant);
+                      return p?.photo ? (
+                        <img src={p.photo} alt={p.name} className="w-14 h-14 rounded-full object-cover border border-border" />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
+                          <Icon name="User" size={24} />
+                        </div>
+                      );
+                    })()}
+                    <h2 className="font-display text-3xl">
+                      {contest.participants.find((p) => p.id === judgeParticipant)?.name}
+                    </h2>
+                  </div>
                   <div className="text-right">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground">Средний балл</p>
                     <p className="font-display text-4xl text-accent">
@@ -376,6 +392,7 @@ export default function Index() {
                 onRemove={removeParticipant}
                 onAdd={addParticipant}
                 addLabel="Добавить участника"
+                onPhoto={setParticipantPhoto}
               />
               <ManagePanel
                 title="Критерии"
@@ -415,12 +432,16 @@ export default function Index() {
                   }`}
                 >
                   <span
-                    className={`font-display text-3xl w-10 text-center ${
+                    className={`font-display text-3xl w-10 text-center shrink-0 ${
                       i === 0 ? 'text-accent' : 'text-muted-foreground'
                     }`}
                   >
                     {i + 1}
                   </span>
+                  {p.photo
+                    ? <img src={p.photo} alt={p.name} className="w-12 h-12 rounded-full object-cover border border-border shrink-0" />
+                    : <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-muted-foreground shrink-0"><Icon name="User" size={18} /></div>
+                  }
                   <div className="flex-1">
                     <p className="font-medium text-lg">{p.name}</p>
                     <div className="h-1.5 mt-2 rounded-full bg-secondary overflow-hidden max-w-xs">
@@ -452,14 +473,16 @@ function ManagePanel({
   onRemove,
   onAdd,
   addLabel,
+  onPhoto,
 }: {
   title: string;
   icon: string;
-  items: { id: string; name: string }[];
+  items: { id: string; name: string; photo?: string }[];
   onRename: (id: string, name: string) => void;
   onRemove: (id: string) => void;
   onAdd: () => void;
   addLabel: string;
+  onPhoto?: (id: string, photo: string | undefined) => void;
 }) {
   return (
     <div className="rounded-2xl border border-border p-6">
@@ -469,11 +492,39 @@ function ManagePanel({
       <div className="space-y-2">
         {items.map((it) => (
           <div key={it.id} className="flex items-center gap-2">
+            {onPhoto && (
+              <label className="shrink-0 w-10 h-10 rounded-lg overflow-hidden cursor-pointer border border-border hover:border-accent/50 transition-colors flex items-center justify-center bg-secondary relative">
+                {it.photo
+                  ? <img src={it.photo} alt="" className="w-full h-full object-cover" />
+                  : <Icon name="ImagePlus" size={16} className="text-muted-foreground" />}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => onPhoto(it.id, reader.result as string);
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
+            )}
             <Input
               value={it.name}
               onChange={(e) => onRename(it.id, e.target.value)}
               className="h-10 bg-background"
             />
+            {onPhoto && it.photo && (
+              <button
+                onClick={() => onPhoto(it.id, undefined)}
+                className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                title="Удалить фото"
+              >
+                <Icon name="ImageOff" size={16} />
+              </button>
+            )}
             <button
               onClick={() => onRemove(it.id)}
               className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
