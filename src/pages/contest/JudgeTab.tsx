@@ -89,12 +89,12 @@ export default function JudgeTab({
       {participant && (
         <div className="rounded-2xl bg-card border border-border overflow-hidden">
           {participant.photo ? (
-            <div className="w-full bg-secondary" style={{ maxHeight: '360px', overflow: 'hidden' }}>
+            <div className="w-full bg-secondary flex items-center justify-center">
               <img
                 src={participant.photo}
                 alt={participant.name}
-                className="w-full object-cover object-top"
-                style={{ maxHeight: '360px' }}
+                className="w-full h-auto object-contain"
+                style={{ maxHeight: '480px' }}
               />
             </div>
           ) : (
@@ -120,11 +120,11 @@ export default function JudgeTab({
               </div>
             </div>
 
-            <div className="space-y-7">
+            <div className="space-y-3">
               {contest.criteria.map((k) => {
                 const val = scores[participant.id]?.[k.id] ?? 0;
                 return (
-                  <div key={k.id}>
+                  <div key={k.id} className="rounded-xl bg-secondary/60 border border-border px-5 py-4">
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-medium">{k.name}</span>
                       <span className="font-display text-2xl text-accent tabular-nums w-10 text-right">
