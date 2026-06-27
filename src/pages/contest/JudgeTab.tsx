@@ -124,30 +124,36 @@ export default function JudgeTab({
               {contest.criteria.map((k) => {
                 const val = scores[participant.id]?.[k.id] ?? 0;
                 return (
-                  <div key={k.id} className="rounded-xl bg-secondary/60 border border-border px-5 py-4">
+                  <div key={k.id} className="rounded-xl border border-border px-5 py-4" style={{ background: 'hsl(36 20% 88%)' }}>
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-medium">{k.name}</span>
                       <span className="font-display text-2xl text-accent tabular-nums w-10 text-right">
                         {val}
                       </span>
                     </div>
-                    <div className="relative flex items-center gap-3">
-                      <span className="text-xs text-muted-foreground w-3">0</span>
-                      <div className="relative flex-1">
-                        <input
-                          type="range"
-                          min={0}
-                          max={10}
-                          step={1}
-                          value={val}
-                          onChange={(e) => setScore(participant.id, k.id, Number(e.target.value))}
-                          className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                          style={{
-                            background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${val * 10}%, var(--secondary) ${val * 10}%, var(--secondary) 100%)`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground w-3">10</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={10}
+                      step={1}
+                      value={val}
+                      onChange={(e) => setScore(participant.id, k.id, Number(e.target.value))}
+                      className="w-full h-2 rounded-full appearance-none cursor-pointer mb-2"
+                      style={{
+                        background: `linear-gradient(to right, hsl(var(--accent)) 0%, hsl(var(--accent)) ${val * 10}%, hsl(36 20% 78%) ${val * 10}%, hsl(36 20% 78%) 100%)`,
+                      }}
+                    />
+                    <div className="flex justify-between px-0.5">
+                      {Array.from({ length: 11 }, (_, i) => (
+                        <span
+                          key={i}
+                          className={`text-[10px] tabular-nums leading-none transition-colors ${
+                            i === val ? 'text-accent font-semibold' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {i}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 );
