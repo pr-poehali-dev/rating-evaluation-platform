@@ -234,25 +234,34 @@ export default function Index() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               {contests.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => {
-                    setActiveId(c.id);
-                    setJudgeParticipant(c.participants[0]?.id ?? '');
-                    setTab('judge');
-                  }}
-                  className="group text-left p-6 rounded-2xl bg-card border border-border hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all"
-                >
+                <div key={c.id} className="group relative text-left p-6 rounded-2xl bg-card border border-border hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all">
+                  <button
+                    onClick={() => {
+                      setActiveId(c.id);
+                      setJudgeParticipant(c.participants[0]?.id ?? '');
+                      setTab('judge');
+                    }}
+                    className="absolute inset-0 rounded-2xl"
+                    aria-label={`Открыть ${c.title}`}
+                  />
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-display text-2xl mb-1">{c.title}</h3>
                       <p className="text-sm text-muted-foreground">{c.date}</p>
                     </div>
-                    <Icon
-                      name="ArrowUpRight"
-                      size={20}
-                      className="text-muted-foreground group-hover:text-accent transition-colors"
-                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!confirm(`Удалить конкурс «${c.title}»?`)) return;
+                        const rest = contests.filter((x) => x.id !== c.id);
+                        setContests(rest);
+                        if (activeId === c.id) setActiveId(rest[0]?.id ?? '');
+                      }}
+                      className="relative z-10 w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                      aria-label="Удалить конкурс"
+                    >
+                      <Icon name="Trash2" size={15} />
+                    </button>
                   </div>
                   <div className="flex gap-5 mt-6 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5">
@@ -262,7 +271,7 @@ export default function Index() {
                       <Icon name="ListChecks" size={15} /> {c.criteria.length} критериев
                     </span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>
